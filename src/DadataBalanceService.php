@@ -1,15 +1,18 @@
 <?php
 namespace unapi\dadata;
 
+use GuzzleHttp\Promise\FulfilledPromise;
 use GuzzleHttp\Promise\PromiseInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
+use unapi\dadata\dto\DadataBalanceDto;
 
 use function GuzzleHttp\json_decode;
+use unapi\interfaces\ServiceInterface;
 
-class DadataBalanceService implements LoggerAwareInterface
+class DadataBalanceService implements ServiceInterface, LoggerAwareInterface
 {
     /** @var DadataClient */
     private $client;
@@ -19,6 +22,8 @@ class DadataBalanceService implements LoggerAwareInterface
     private $secretKey;
     /** @var LoggerInterface */
     private $logger;
+    /** @var string */
+    private $responseClass = DadataBalanceDto::class;
 
     /**
      * @param array $config Service configuration settings.
@@ -52,6 +57,9 @@ class DadataBalanceService implements LoggerAwareInterface
         } else {
             throw new \InvalidArgumentException('Logger must be instance of LoggerInterface');
         }
+
+        if (isset($config['responseClass']))
+            $this->responseClass = $config['responseClass'];
     }
 
     /**
@@ -77,7 +85,10 @@ class DadataBalanceService implements LoggerAwareInterface
                 $answer = $response->getBody()->getContents();
                 $this->logger->debug('Response: {answer}', ['answer' => $answer]);
                 $result = json_decode($answer);
-                return $result->balance;
+                return new FulfilledPromise($this->responseClass::toDto([
+                    'amount' => $result->balance
+                ]));
+
             });
     }
 }
