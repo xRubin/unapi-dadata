@@ -91,7 +91,6 @@ class DadataCleanService implements LoggerAwareInterface
             $answer = $response->getBody()->getContents();
             $this->logger->debug('Response: {answer}', ['answer' => $answer]);
             return new FulfilledPromise(array_map(function (array $data) {
-                var_dump($data);
                 return $this->responseClass::toDto($data);
             }, json_decode($answer, true)));
         });

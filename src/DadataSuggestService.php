@@ -2,6 +2,7 @@
 
 namespace unapi\dadata;
 
+use GuzzleHttp\Promise\FulfilledPromise;
 use GuzzleHttp\Promise\PromiseInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Log\LoggerAwareInterface;
@@ -77,7 +78,59 @@ class DadataSuggestService implements LoggerAwareInterface
             $answer = $response->getBody()->getContents();
             $this->logger->debug('Response: {answer}', ['answer' => $answer]);
             $result = json_decode($answer);
-            return $result->suggestions;
+            return new FulfilledPromise($result->suggestions);
         });
     }
+
+    /**
+     * @param string $address
+     * @param array $options
+     * @return PromiseInterface
+     */
+    public function suggestAddress(string $address, array $options = [])
+    {
+        return $this->suggest('address', array_merge($options, ['query' => $address]));
+    }
+
+    /**
+     * @param string $bank
+     * @param array $options
+     * @return PromiseInterface
+     */
+    public function suggestBank(string $bank, array $options = [])
+    {
+        return $this->suggest('bank', array_merge($options, ['query' => $bank]));
+    }
+
+    /**
+     * @param string $email
+     * @param array $options
+     * @return PromiseInterface
+     */
+    public function suggestEmail(string $email, array $options = [])
+    {
+        return $this->suggest('email', array_merge($options, ['query' => $email]));
+    }
+
+    /**
+     * @param string $name
+     * @param array $options
+     * @return PromiseInterface
+     */
+    public function suggestName(string $name, array $options = [])
+    {
+        return $this->suggest('fio', array_merge($options, ['query' => $name]));
+    }
+
+    /**
+     * @param string $organization
+     * @param array $options
+     * @return PromiseInterface
+     */
+    public function suggestOrganization(string $organization, array $options = [])
+    {
+        return $this->suggest('party', array_merge($options, ['query' => $organization]));
+    }
+
+
 }
