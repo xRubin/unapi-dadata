@@ -31,6 +31,8 @@ class DadataBalanceDto implements DadataBalanceInterface
      */
     public static function toDto(array $data): DtoInterface
     {
-        return (new DadataBalanceDto($data['amount']));
+        return new DadataBalanceDto(
+            (float)$data['amount']
+        );
     }
 }

@@ -1,4 +1,5 @@
 <?php
+
 namespace unapi\dadata;
 
 use GuzzleHttp\Promise\PromiseInterface;
